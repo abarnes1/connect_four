@@ -32,10 +32,10 @@ class Gameboard
     column_contents
   end
 
-  def drop(column, piece)
+  def drop(column, token)
     indices = column_indices(column).reverse
     first_open = indices.find { |index| @board[index] == Tokens::EMPTY }
-    @board[first_open] = piece
+    @board[first_open] = token
   end
 
   private 
