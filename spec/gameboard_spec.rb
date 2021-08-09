@@ -1,6 +1,87 @@
 require_relative '../lib/gameboard'
 
 describe Gameboard do
+  describe '#connected_count' do
+    context 'when index has no token' do
+      subject(:none_in_row) { described_class.new(2, 2) }
+
+      context 'when checking empty index' do
+        it 'returns 0' do
+          expect(none_in_row.connected_count(0)).to be_zero
+        end
+      end
+  
+      context 'when checking out of bounds index' do
+        it 'returns 0' do
+          expect(none_in_row.connected_count(100)).to be_zero
+        end
+      end
+    end
+
+    context 'when single token' do
+      subject(:single_drop_game) { described_class.new }
+       
+      it 'returns streak of 1' do
+        single_drop_game.drop(3, 'X')
+
+        index_to_check = single_drop_game.last_index_placed
+        connected = single_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(1)
+      end
+    end
+
+    context 'when 3 in a row horizontal' do
+      subject(:row_drop_game) { described_class.new }
+       
+      it 'returns streak of 3' do
+        row_drop_game.drop(1, 'X')
+        row_drop_game.drop(2, 'X')
+        row_drop_game.drop(3, 'X')
+
+        index_to_check = row_drop_game.last_index_placed
+        connected = row_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(3)
+      end
+    end
+
+    context 'when 3 in a row vertical' do
+      subject(:column_drop_game) { described_class.new }
+       
+      it 'returns streak of 3' do
+        column_drop_game.drop(3, 'X')
+        column_drop_game.drop(3, 'X')
+        column_drop_game.drop(3, 'X')
+
+        index_to_check = column_drop_game.last_index_placed
+        connected = column_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(3)
+      end
+    end
+
+    context 'when 3 in a row diagonal' do
+      subject(:diagonal_drop_game) { described_class.new }
+       
+      it 'returns streak of 3' do
+        diagonal_drop_game.drop(1, 'X')
+
+        diagonal_drop_game.drop(2, '')
+        diagonal_drop_game.drop(2, 'X')
+
+        diagonal_drop_game.drop(3, '')
+        diagonal_drop_game.drop(3, '')
+        diagonal_drop_game.drop(3, 'X')
+
+        index_to_check = diagonal_drop_game.last_index_placed
+        connected = diagonal_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(3)
+      end
+    end
+  end
+
   describe '#coord_to_index' do
     subject(:coord_game) { described_class.new }
 
@@ -111,87 +192,6 @@ describe Gameboard do
         last_index = last_placed_game.last_index_placed
 
         expect(last_index).to eq(0)
-      end
-    end
-  end
-
-  describe '#connected_count' do
-    context 'when index has no token' do
-      subject(:none_in_row) { described_class.new(2, 2) }
-
-      context 'when checking empty index' do
-        it 'returns 0' do
-          expect(none_in_row.connected_count(0)).to be_zero
-        end
-      end
-  
-      context 'when checking out of bounds index' do
-        it 'returns 0' do
-          expect(none_in_row.connected_count(100)).to be_zero
-        end
-      end
-    end
-
-    context 'when single token' do
-      subject(:single_drop_game) { described_class.new }
-       
-      it 'returns streak of 1' do
-        single_drop_game.drop(3, 'X')
-
-        index_to_check = single_drop_game.last_index_placed
-        connected = single_drop_game.connected_count(index_to_check)
-
-        expect(connected).to eq(1)
-      end
-    end
-
-    context 'when 3 in a row horizontal' do
-      subject(:row_drop_game) { described_class.new }
-       
-      it 'returns streak of 3' do
-        row_drop_game.drop(1, 'X')
-        row_drop_game.drop(2, 'X')
-        row_drop_game.drop(3, 'X')
-
-        index_to_check = row_drop_game.last_index_placed
-        connected = row_drop_game.connected_count(index_to_check)
-
-        expect(connected).to eq(3)
-      end
-    end
-
-    context 'when 3 in a row vertical' do
-      subject(:column_drop_game) { described_class.new }
-       
-      it 'returns streak of 3' do
-        column_drop_game.drop(3, 'X')
-        column_drop_game.drop(3, 'X')
-        column_drop_game.drop(3, 'X')
-
-        index_to_check = column_drop_game.last_index_placed
-        connected = column_drop_game.connected_count(index_to_check)
-
-        expect(connected).to eq(3)
-      end
-    end
-
-    context 'when 3 in a row diagonal' do
-      subject(:diagonal_drop_game) { described_class.new }
-       
-      it 'returns streak of 3' do
-        diagonal_drop_game.drop(1, 'X')
-
-        diagonal_drop_game.drop(2, '')
-        diagonal_drop_game.drop(2, 'X')
-
-        diagonal_drop_game.drop(3, '')
-        diagonal_drop_game.drop(3, '')
-        diagonal_drop_game.drop(3, 'X')
-
-        index_to_check = diagonal_drop_game.last_index_placed
-        connected = diagonal_drop_game.connected_count(index_to_check)
-
-        expect(connected).to eq(3)
       end
     end
   end
