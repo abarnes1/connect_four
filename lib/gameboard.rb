@@ -58,19 +58,24 @@ class Gameboard
     @board.all? { |token| token != Tokens::EMPTY } 
   end
 
-  def streak_length(index)
+  def connected_count(index)
     return 0 if @board[index] == Tokens::EMPTY || !index_inbounds?(index)
 
-    directions = [[0, 1], 
-                  [1, 0], 
-                  [1, 1], 
-                  [1, -1]]
+    best_streak = 1
+    match_token = @board[index]
 
+    directions = [[0, 1], [1, 0], [1, 1], [1, -1]]
+                
+    directions.each do |coord_move|
+      other_move = coord_move.map { |move| move * -1 }
 
-    # check left and right
-    # check up and down
-    # check \ diagonal
-    # check / diagonal
+      # p "right #{measure_repeat(coord_move, index, match_token)}"
+      # p "left #{measure_repeat(other_move, index, match_token)}"
+      streak = 1 + measure_repeat(coord_move, index, match_token) + measure_repeat(other_move, index, match_token)
+      best_streak = streak if streak > best_streak
+    end
+
+    best_streak
   end
 
   def valid_coord_move?(x, y, start_index)
@@ -83,15 +88,15 @@ class Gameboard
   end
 
   def coord_to_index(x, y)
-    (y * @columns) + x
+    return nil unless x.between?(0, @columns - 1) && y.between?(0, @rows - 1)
+
+    index = (y * @columns) + x
   end
 
   def index_to_coord(index)
+    return nil unless index_inbounds?(index)
+
     [index % @columns, index / @columns]
-  end
-
-  def index_after_move(move_coords, index)
-
   end
 
   private 
@@ -125,24 +130,17 @@ class Gameboard
     new_index = start_index + ()
   end
 
-  def recursive_measure(movement, index, token)
-    # base case, not in m
+  def measure_repeat(move, index, token)
+    return 0 unless valid_coord_move?(move[0], move[1], index)
+
+    coord = index_to_coord(index)
+    coord[0] += move[0]
+    coord[1] += move[1]
+    new_index = coord_to_index(coord[0], coord[1])
+
+    return 0 if @board[new_index] != token
+
+    1 + measure_repeat(move, new_index, token)
   end
-
-  # def edge_of_row?(index)
-  #   row_position = index % @columns
-  #   row_end_remainder = @columns - 1
-  #   row_start_remainder = 0
-
-  #   [row_start_remainder, row_end_remainder].include? row_position
-  # end
-
-  # def edge_of_column?(index)
-  #   row_position = index % @columns
-  #   row_end_remainder = @columns - 1
-  #   row_start_remainder = 0
-
-  #   [row_start_remainder, row_end_remainder].include? row_position
-  # end
 end
 

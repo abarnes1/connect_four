@@ -1,6 +1,38 @@
 require_relative '../lib/gameboard'
 
 describe Gameboard do
+  describe '#coord_to_index' do
+    subject(:coord_game) { described_class.new }
+
+    context 'coord is out of bounds' do
+      invalid_x = -1
+      invalid_y = 10
+      valid_x = 1
+      valid_y = 1
+
+      it "returns nil when x-coord is invalid (#{invalid_x})" do
+        valid = coord_game.coord_to_index(invalid_x, valid_y)
+        expect(valid).to be_nil
+      end
+
+      it "returns nil when y-coord is invalid (#{invalid_y})" do
+        valid = coord_game.coord_to_index(valid_x, invalid_y)
+        expect(valid).to be_nil
+      end
+    end
+
+    context 'coord is in bounds' do
+      valid_x = 3
+      valid_y = 3
+      correct_index = 24
+
+      it "returns #{correct_index} for coord [#{valid_x}, #{valid_y}]" do
+        actual = coord_game.coord_to_index(valid_x, valid_y)
+        expect(actual).to eq(correct_index)
+      end
+    end
+  end
+
   describe '#drop' do
     column_number = 3
     token = 'O'
@@ -83,20 +115,83 @@ describe Gameboard do
     end
   end
 
-  describe '#streak_length' do
+  describe '#connected_count' do
     context 'when index has no token' do
       subject(:none_in_row) { described_class.new(2, 2) }
 
       context 'when checking empty index' do
         it 'returns 0' do
-          expect(none_in_row.streak_length(0)).to be_zero
+          expect(none_in_row.connected_count(0)).to be_zero
         end
       end
   
       context 'when checking out of bounds index' do
         it 'returns 0' do
-          expect(none_in_row.streak_length(100)).to be_zero
+          expect(none_in_row.connected_count(100)).to be_zero
         end
+      end
+    end
+
+    context 'when single token' do
+      subject(:single_drop_game) { described_class.new }
+       
+      it 'returns streak of 1' do
+        single_drop_game.drop(3, 'X')
+
+        index_to_check = single_drop_game.last_index_placed
+        connected = single_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(1)
+      end
+    end
+
+    context 'when 3 in a row horizontal' do
+      subject(:row_drop_game) { described_class.new }
+       
+      it 'returns streak of 3' do
+        row_drop_game.drop(1, 'X')
+        row_drop_game.drop(2, 'X')
+        row_drop_game.drop(3, 'X')
+
+        index_to_check = row_drop_game.last_index_placed
+        connected = row_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(3)
+      end
+    end
+
+    context 'when 3 in a row vertical' do
+      subject(:column_drop_game) { described_class.new }
+       
+      it 'returns streak of 3' do
+        column_drop_game.drop(3, 'X')
+        column_drop_game.drop(3, 'X')
+        column_drop_game.drop(3, 'X')
+
+        index_to_check = column_drop_game.last_index_placed
+        connected = column_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(3)
+      end
+    end
+
+    context 'when 3 in a row diagonal' do
+      subject(:diagonal_drop_game) { described_class.new }
+       
+      it 'returns streak of 3' do
+        diagonal_drop_game.drop(1, 'X')
+
+        diagonal_drop_game.drop(2, '')
+        diagonal_drop_game.drop(2, 'X')
+
+        diagonal_drop_game.drop(3, '')
+        diagonal_drop_game.drop(3, '')
+        diagonal_drop_game.drop(3, 'X')
+
+        index_to_check = diagonal_drop_game.last_index_placed
+        connected = diagonal_drop_game.connected_count(index_to_check)
+
+        expect(connected).to eq(3)
       end
     end
   end
