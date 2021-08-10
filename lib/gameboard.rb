@@ -24,6 +24,16 @@ class Gameboard
     output
   end
 
+  def all_columns
+    columns = []
+
+    @columns.times do |index|
+      columns << column(index)
+    end
+
+    columns
+  end
+
   def column(column)
     column_contents = []
     indices = column_indices(column)
@@ -37,7 +47,7 @@ class Gameboard
 
   def row(row)
     row_contents = []
-    indices = row_indices(column)
+    indices = row_indices(row)
 
     indices.each do |index|
       row_contents << @board[index]
@@ -55,42 +65,40 @@ class Gameboard
   end
 
   def full?
-    @board.all? { |token| token != Tokens::EMPTY } 
+    @board.all? { |token| token != Tokens::EMPTY }
   end
 
   def connected_count(index)
     return 0 if @board[index] == Tokens::EMPTY || !index_inbounds?(index)
 
-    best_streak = 1
+    highest_streak = 1
     match_token = @board[index]
 
-    directions = [[0, 1], [1, 0], [1, 1], [1, -1]]
-                
-    directions.each do |coord_move|
-      other_move = coord_move.map { |move| move * -1 }
+    xy_movements = [[0, 1], [1, 0], [1, 1], [1, -1]]
 
-      # p "right #{measure_repeat(coord_move, index, match_token)}"
-      # p "left #{measure_repeat(other_move, index, match_token)}"
-      streak = 1 + measure_repeat(coord_move, index, match_token) + measure_repeat(other_move, index, match_token)
-      best_streak = streak if streak > best_streak
+    xy_movements.each do |single_move|
+      opposite_move = single_move.map { |move| move * -1 }
+
+      streak = 1 + measure_repeat(single_move, index, match_token) + measure_repeat(opposite_move, index, match_token)
+      highest_streak = streak if streak > highest_streak
     end
 
-    best_streak
+    highest_streak
   end
 
-  def valid_coord_move?(x, y, start_index)
-    return false if x < 0 && column_indices(1).include?(start_index)
-    return false if x > 0 && column_indices(@columns).include?(start_index)
-    return false if y < 0 && row_indices(1).include?(start_index)
-    return false if y > 0 && row_indices(@rows).include?(start_index)
+  def valid_coord_move?(x_move, y_move, start_index)
+    return false if x_move.negative? && column_indices(1).include?(start_index)
+    return false if x_move.positive? && column_indices(@columns).include?(start_index)
+    return false if y_move.negative? && row_indices(1).include?(start_index)
+    return false if y_move.positive? && row_indices(@rows).include?(start_index)
 
     true
   end
 
-  def coord_to_index(x, y)
-    return nil unless x.between?(0, @columns - 1) && y.between?(0, @rows - 1)
+  def coord_to_index(x_coord, y_coord)
+    return nil unless x_coord.between?(0, @columns - 1) && y_coord.between?(0, @rows - 1)
 
-    index = (y * @columns) + x
+    (y_coord * @columns) + x_coord
   end
 
   def index_to_coord(index)
@@ -99,7 +107,7 @@ class Gameboard
     [index % @columns, index / @columns]
   end
 
-  private 
+  private
 
   def column_indices(column)
     indices = []
@@ -126,10 +134,6 @@ class Gameboard
     index.between?(0, max_index)
   end
 
-  def index_in_direction(x, y, start_index)
-    new_index = start_index + ()
-  end
-
   def measure_repeat(move, index, token)
     return 0 unless valid_coord_move?(move[0], move[1], index)
 
@@ -143,4 +147,3 @@ class Gameboard
     1 + measure_repeat(move, new_index, token)
   end
 end
-

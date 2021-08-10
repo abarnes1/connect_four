@@ -1,6 +1,25 @@
 require_relative '../lib/gameboard'
 
 describe Gameboard do
+  context '#all_columns' do
+    subject(:all_columns_game) { described_class.new(6, 7) }
+
+    context 'when game has 7 columns' do
+      it 'returns 7 columns' do
+        count = all_columns_game.all_columns.size
+        expect(count).to eq(7)
+      end
+    end
+
+    context 'when token dropped in column 2' do
+      it 'is not empty at index 1' do
+        columns = all_columns_game.all_columns
+
+        expect(columns[1]).not_to be_empty
+      end
+    end
+  end
+
   describe '#connected_count' do
     context 'when index has no token' do
       subject(:none_in_row) { described_class.new(2, 2) }
@@ -10,7 +29,7 @@ describe Gameboard do
           expect(none_in_row.connected_count(0)).to be_zero
         end
       end
-  
+
       context 'when checking out of bounds index' do
         it 'returns 0' do
           expect(none_in_row.connected_count(100)).to be_zero
@@ -20,7 +39,7 @@ describe Gameboard do
 
     context 'when single token' do
       subject(:single_drop_game) { described_class.new }
-       
+
       it 'returns streak of 1' do
         single_drop_game.drop(3, 'X')
 
@@ -33,7 +52,7 @@ describe Gameboard do
 
     context 'when 3 in a row horizontal' do
       subject(:row_drop_game) { described_class.new }
-       
+
       it 'returns streak of 3' do
         row_drop_game.drop(1, 'X')
         row_drop_game.drop(2, 'X')
@@ -48,7 +67,7 @@ describe Gameboard do
 
     context 'when 3 in a row vertical' do
       subject(:column_drop_game) { described_class.new }
-       
+
       it 'returns streak of 3' do
         column_drop_game.drop(3, 'X')
         column_drop_game.drop(3, 'X')
@@ -63,7 +82,7 @@ describe Gameboard do
 
     context 'when 3 in a row diagonal' do
       subject(:diagonal_drop_game) { described_class.new }
-       
+
       it 'returns streak of 3' do
         diagonal_drop_game.drop(1, 'X')
 
@@ -200,7 +219,6 @@ describe Gameboard do
     subject(:coord_test_game) { described_class.new }
 
     context 'when moving inside the board' do
-
       it 'is a valid move' do
         valid = coord_test_game.valid_coord_move?(1, 1, 0)
         expect(valid).to eq(true)
