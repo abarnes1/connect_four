@@ -189,26 +189,26 @@ describe Gameboard do
     end
   end
 
-  # describe '#last_index_placed' do
-  #   subject(:last_placed_game) { described_class.new(2, 2) }
+  describe '#last_drop_index' do
+    subject(:last_placed_game) { described_class.new(2, 2) }
 
-  #   context 'when dropped in col 1 of 2x2' do
-  #     it 'returns index 2 on first drop' do
-  #       last_placed_game.drop(1, 'X')
-  #       last_index = last_placed_game.last_index_placed
+    context 'when dropped in col 1 of 2x2' do
+      it 'returns index 2 on first drop' do
+        last_placed_game.drop(1, 'X')
+        last_index = last_placed_game.last_drop_index
 
-  #       expect(last_index).to eq(2)
-  #     end
+        expect(last_index).to eq(2)
+      end
 
-  #     it 'returns index 0 on second drop' do
-  #       last_placed_game.drop(1, 'X')
-  #       last_placed_game.drop(1, 'X')
-  #       last_index = last_placed_game.last_index_placed
+      it 'returns index 0 on second drop' do
+        last_placed_game.drop(1, 'X')
+        last_placed_game.drop(1, 'X')
+        last_index = last_placed_game.last_drop_index
 
-  #       expect(last_index).to eq(0)
-  #     end
-  #   end
-  # end
+        expect(last_index).to eq(0)
+      end
+    end
+  end
 
   describe '#valid_coord_move?' do
     subject(:coord_test_game) { described_class.new }

@@ -3,10 +3,13 @@ require_relative 'tokens'
 
 # contains game rows and columns, their boundaries, and allows tokens to be placed
 class Gameboard
+  attr_reader :last_drop_index
+
   def initialize(rows = 6, columns = 7)
     @columns = columns.freeze
     @rows = rows.freeze
     @board = Array.new(@columns * @rows) { Tokens::EMPTY }
+    @last_drop_index = nil
   end
 
   def to_s
@@ -60,7 +63,7 @@ class Gameboard
 
     @board[first_open] = token
 
-    first_open
+    @last_drop_index = first_open
   end
 
   def full?
