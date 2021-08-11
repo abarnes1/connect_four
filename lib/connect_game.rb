@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'gameboard'
+require_relative 'human_player'
+require_relative 'computer_player'
 
 # logic to setup, start, allow moves, and end a connect game
 class ConnectGame
@@ -27,7 +29,7 @@ class ConnectGame
       player_type = gets.chomp
     end
 
-    if player_type.eq?('1')
+    if player_type.eql?('1')
       HumanPlayer.new(token)
     else
       ComputerPlayer.new(token)
