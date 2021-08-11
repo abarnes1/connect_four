@@ -12,7 +12,7 @@ describe Gameboard do
     end
 
     context 'when token dropped in column 2' do
-      it 'is not empty at index 1' do
+      it 'returns columns in correct order' do
         columns = all_columns_game.all_columns
 
         expect(columns[1]).not_to be_empty
@@ -41,9 +41,7 @@ describe Gameboard do
       subject(:single_drop_game) { described_class.new }
 
       it 'returns streak of 1' do
-        single_drop_game.drop(3, 'X')
-
-        index_to_check = single_drop_game.last_index_placed
+        index_to_check = single_drop_game.drop(3, 'X')
         connected = single_drop_game.connected_count(index_to_check)
 
         expect(connected).to eq(1)
@@ -56,9 +54,8 @@ describe Gameboard do
       it 'returns streak of 3' do
         row_drop_game.drop(1, 'X')
         row_drop_game.drop(2, 'X')
-        row_drop_game.drop(3, 'X')
 
-        index_to_check = row_drop_game.last_index_placed
+        index_to_check = row_drop_game.drop(3, 'X')
         connected = row_drop_game.connected_count(index_to_check)
 
         expect(connected).to eq(3)
@@ -71,9 +68,8 @@ describe Gameboard do
       it 'returns streak of 3' do
         column_drop_game.drop(3, 'X')
         column_drop_game.drop(3, 'X')
-        column_drop_game.drop(3, 'X')
+        index_to_check = column_drop_game.drop(3, 'X')
 
-        index_to_check = column_drop_game.last_index_placed
         connected = column_drop_game.connected_count(index_to_check)
 
         expect(connected).to eq(3)
@@ -91,9 +87,8 @@ describe Gameboard do
 
         diagonal_drop_game.drop(3, '')
         diagonal_drop_game.drop(3, '')
-        diagonal_drop_game.drop(3, 'X')
+        index_to_check = diagonal_drop_game.drop(3, 'X')
 
-        index_to_check = diagonal_drop_game.last_index_placed
         connected = diagonal_drop_game.connected_count(index_to_check)
 
         expect(connected).to eq(3)
@@ -194,26 +189,26 @@ describe Gameboard do
     end
   end
 
-  describe '#last_index_placed' do
-    subject(:last_placed_game) { described_class.new(2, 2) }
+  # describe '#last_index_placed' do
+  #   subject(:last_placed_game) { described_class.new(2, 2) }
 
-    context 'when dropped in col 1 of 2x2' do
-      it 'returns index 2 on first drop' do
-        last_placed_game.drop(1, 'X')
-        last_index = last_placed_game.last_index_placed
+  #   context 'when dropped in col 1 of 2x2' do
+  #     it 'returns index 2 on first drop' do
+  #       last_placed_game.drop(1, 'X')
+  #       last_index = last_placed_game.last_index_placed
 
-        expect(last_index).to eq(2)
-      end
+  #       expect(last_index).to eq(2)
+  #     end
 
-      it 'returns index 0 on second drop' do
-        last_placed_game.drop(1, 'X')
-        last_placed_game.drop(1, 'X')
-        last_index = last_placed_game.last_index_placed
+  #     it 'returns index 0 on second drop' do
+  #       last_placed_game.drop(1, 'X')
+  #       last_placed_game.drop(1, 'X')
+  #       last_index = last_placed_game.last_index_placed
 
-        expect(last_index).to eq(0)
-      end
-    end
-  end
+  #       expect(last_index).to eq(0)
+  #     end
+  #   end
+  # end
 
   describe '#valid_coord_move?' do
     subject(:coord_test_game) { described_class.new }

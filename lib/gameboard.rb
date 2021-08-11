@@ -1,14 +1,12 @@
 require 'pry-byebug'
 require_relative 'tokens'
 
+# contains game rows and columns, their boundaries, and allows tokens to be placed
 class Gameboard
-  attr_reader :last_index_placed
-
   def initialize(rows = 6, columns = 7)
     @columns = columns.freeze
     @rows = rows.freeze
     @board = Array.new(@columns * @rows) { Tokens::EMPTY }
-    @last_index_placed = nil
   end
 
   def to_s
@@ -61,7 +59,8 @@ class Gameboard
     first_open = indices.find { |index| @board[index] == Tokens::EMPTY }
 
     @board[first_open] = token
-    @last_index_placed = first_open
+
+    first_open
   end
 
   def full?
