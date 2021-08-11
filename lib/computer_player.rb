@@ -5,7 +5,7 @@ class ComputerPlayer
     @marker = marker
   end
 
-  def make_choice(columns)
-    columns.sample
+  def choose_move(choices)
+    choices.sample
   end
 end
