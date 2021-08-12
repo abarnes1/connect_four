@@ -1,25 +1,6 @@
 require_relative '../lib/gameboard'
 
 describe Gameboard do
-  context '#all_columns' do
-    subject(:all_columns_game) { described_class.new(6, 7) }
-
-    context 'when game has 7 columns' do
-      it 'returns 7 columns' do
-        count = all_columns_game.all_columns.size
-        expect(count).to eq(7)
-      end
-    end
-
-    context 'when token dropped in column 2' do
-      it 'returns columns in correct order' do
-        columns = all_columns_game.all_columns
-
-        expect(columns[1]).not_to be_empty
-      end
-    end
-  end
-
   describe '#connected_count' do
     context 'when index has no token' do
       subject(:none_in_row) { described_class.new(2, 2) }
@@ -99,7 +80,7 @@ describe Gameboard do
   describe '#coord_to_index' do
     subject(:coord_game) { described_class.new }
 
-    context 'coord is out of bounds' do
+    context 'when coord is out of bounds' do
       invalid_x = -1
       invalid_y = 10
       valid_x = 1
@@ -116,7 +97,7 @@ describe Gameboard do
       end
     end
 
-    context 'coord is in bounds' do
+    context 'when coord is in bounds' do
       valid_x = 3
       valid_y = 3
       correct_index = 24
@@ -124,6 +105,27 @@ describe Gameboard do
       it "returns #{correct_index} for coord [#{valid_x}, #{valid_y}]" do
         actual = coord_game.coord_to_index(valid_x, valid_y)
         expect(actual).to eq(correct_index)
+      end
+    end
+  end
+
+  describe '#index_to_coord' do
+    subject(:index_game) { described_class.new }
+
+    context 'when index is out of bounds' do
+      invalid_index = 100
+      it "returns nil when index is invalid #{invalid_index}" do
+        actual = index_game.index_to_coord(invalid_index)
+        expect(actual).to be_nil
+      end
+    end
+
+    context 'when index is in bounds' do
+      valid_index = 9
+      expected_coord = [2, 1]
+      it "returns #{expected_coord} when index is valid #{valid_index}" do
+        actual = index_game.index_to_coord(valid_index)
+        expect(actual).to eq(expected_coord)
       end
     end
   end
@@ -185,27 +187,6 @@ describe Gameboard do
         filled_game.drop(1, 'X')
 
         expect(filled_game).to be_full
-      end
-    end
-  end
-
-  describe '#last_drop_index' do
-    subject(:last_placed_game) { described_class.new(2, 2) }
-
-    context 'when dropped in col 1 of 2x2' do
-      it 'returns index 2 on first drop' do
-        last_placed_game.drop(1, 'X')
-        last_index = last_placed_game.last_drop_index
-
-        expect(last_index).to eq(2)
-      end
-
-      it 'returns index 0 on second drop' do
-        last_placed_game.drop(1, 'X')
-        last_placed_game.drop(1, 'X')
-        last_index = last_placed_game.last_drop_index
-
-        expect(last_index).to eq(0)
       end
     end
   end

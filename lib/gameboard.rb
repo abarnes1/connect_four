@@ -3,13 +3,12 @@ require_relative 'tokens'
 
 # contains game rows and columns, their boundaries, and allows tokens to be placed
 class Gameboard
-  attr_reader :last_drop_index
+  attr_reader :last_move_index, :columns
 
   def initialize(rows = 6, columns = 7)
     @columns = columns.freeze
     @rows = rows.freeze
     @board = Array.new(@columns * @rows) { Tokens::EMPTY }
-    @last_drop_index = nil
   end
 
   def to_s
@@ -25,36 +24,9 @@ class Gameboard
     output
   end
 
-  def all_columns
-    columns = []
-
-    @columns.times do |index|
-      columns << column(index)
-    end
-
-    columns
-  end
-
   def column(column)
-    column_contents = []
     indices = column_indices(column)
-
-    indices.each do |index|
-      column_contents << @board[index]
-    end
-
-    column_contents
-  end
-
-  def row(row)
-    row_contents = []
-    indices = row_indices(row)
-
-    indices.each do |index|
-      row_contents << @board[index]
-    end
-
-    row_contents
+    indices.map { |index| @board[index] }
   end
 
   def drop(column, token)
@@ -63,7 +35,7 @@ class Gameboard
 
     @board[first_open] = token
 
-    @last_drop_index = first_open
+    first_open
   end
 
   def full?
