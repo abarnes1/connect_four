@@ -1,6 +1,29 @@
 require_relative '../lib/gameboard'
 
 describe Gameboard do
+  describe '#column_full?' do
+    context 'in a 2x2 game' do
+      subject(:full_column_game) { described_class.new(2, 2) }
+
+      context 'when column 1 has 2 dropped tokens' do
+        it 'is a full column' do
+          full_column_game.drop(1, 'X')
+          full_column_game.drop(1, 'X')
+
+          expect(full_column_game.column_full(1)).to eq(true)
+        end
+      end
+
+      context 'when column 1 has 1 dropped tokens' do
+        it 'is not a full column' do
+          full_column_game.drop(1, 'X')
+
+          expect(full_column_game.column_full(1)).to eq(false)
+        end
+      end
+    end
+  end
+
   describe '#connected_count' do
     context 'when index has no token' do
       subject(:none_in_row) { described_class.new(2, 2) }

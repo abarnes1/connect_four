@@ -38,6 +38,11 @@ class Gameboard
     first_open
   end
 
+  def column_full?(column)
+    column_tokens = column(column)
+    column_tokens.any?
+  end
+
   def full?
     @board.all? { |token| token != Tokens::EMPTY }
   end

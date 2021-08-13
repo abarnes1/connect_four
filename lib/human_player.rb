@@ -1,7 +1,8 @@
 class HumanPlayer
-  attr_reader :marker
+  attr_reader :token, :name
 
-  def initialize(marker)
-    @marker = marker
+  def initialize(name, token)
+    @token = token
+    @name = name
   end
 end

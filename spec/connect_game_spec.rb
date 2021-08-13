@@ -68,4 +68,78 @@ describe ConnectGame do
       end
     end
   end
+
+  describe '#switch_player' do
+    subject(:active_player_game) { described_class.new }
+    let(:player_one) { double('player_one') }
+    let(:player_two) { double('player_two') }
+
+    before do
+      allow(active_player_game).to receive(:create_player).and_return(player_one, player_two)
+    end
+
+    context 'when player 1 is active' do
+      it 'switches to player 2' do
+        expected = player_two
+        active_player_game.setup_game
+        actual = active_player_game.switch_player
+
+        expect(actual).to be(expected)
+      end
+    end
+
+    context 'when player 2 is active' do
+      it 'switches to player 1' do
+        expected = player_one
+        active_player_game.setup_game
+        active_player_game.switch_player
+        actual = active_player_game.switch_player
+
+        expect(actual).to be(expected)
+      end
+    end
+  end
+
+  describe '#valid_player_input?' do
+    subject(:player_input_game) { described_class.new(4, 4, 4) }
+    valid_input = '2'
+    invalid_input = '9'
+
+    context "when input is within column bounds (#{valid_input})" do
+      it 'is valid input' do
+        result = player_input_game.valid_player_input?(valid_input)
+        expect(result).to eq(true)
+      end
+    end
+
+    context "when input is outside column bounds (#{invalid_input})" do
+      it 'is not valid input' do
+        result = player_input_game.valid_player_input?(invalid_input)
+        expect(result).to eq(false)
+      end
+    end
+  end
+
+  # describe '#valid_move?' do
+  #   subject(:valid_move_game) { described_class.new(2, 2, 2) }
+  #   full_column = 1
+  #   free_column = 2
+
+  #   before(:all) do
+  #     valid_move_game.drop()
+  #   end
+
+  #   context 'when column is full' do
+  #     it 'is an invalid move' do
+        
+  #     end
+  #   end
+
+  #   context 'when column is not full' do
+  #     it 'is a valid move' do
+        
+  #     end
+  #   end
+    
+  # end
 end
