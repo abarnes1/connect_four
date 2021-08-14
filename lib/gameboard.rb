@@ -90,17 +90,17 @@ class Gameboard
   end
 
   def valid_coord_move?(x_move, y_move, start_index)
-    in_row_bounds?(x_move, start_index) && cross_column_boundary?(y_move, start_index)
+    in_row_bounds?(x_move, start_index) && in_column_bounds?(y_move, start_index)
   end
 
-  def in_row_bounds?(x_move, start_index) 
+  def in_row_bounds?(x_move, start_index)
     return false if x_move.negative? && column_indices(1).include?(start_index)
     return false if x_move.positive? && column_indices(@columns).include?(start_index)
 
     true
   end
 
-  def cross_column_boundary?(y_move, start_index) 
+  def in_column_bounds?(y_move, start_index)
     return false if y_move.negative? && row_indices(1).include?(start_index)
     return false if y_move.positive? && row_indices(@rows).include?(start_index)
 
