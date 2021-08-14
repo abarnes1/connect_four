@@ -62,6 +62,17 @@ class Gameboard
     highest_streak
   end
 
+  def valid_moves
+    moves = []
+
+    @columns.times do |index|
+      column = index + 1
+      moves << (column) unless column_full?(column)
+    end
+
+    moves
+  end
+
   private
 
   def column_indices(column)

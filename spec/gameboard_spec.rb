@@ -176,4 +176,43 @@ describe Gameboard do
       end
     end
   end
+
+  describe '#valid_moves' do
+    context 'when game has 2 columns' do
+      subject(:two_column_game) { described_class.new(2, 2) }
+
+      context 'when board is empty' do
+        it 'returns [1, 2]' do
+          expected = [1, 2]
+          actual = two_column_game.valid_moves
+
+          expect(actual).to eq(expected)
+        end
+      end
+
+      context 'when column 1 is full' do
+        it 'returns [2]' do
+          two_column_game.drop(1, 'X')
+          two_column_game.drop(1, 'X')
+          expected = [2]
+          actual = two_column_game.valid_moves
+
+          expect(actual).to eq(expected)
+        end
+      end
+
+      context 'when all columns full' do
+        it 'returns emtpy array' do
+          two_column_game.drop(1, 'X')
+          two_column_game.drop(1, 'X')
+          two_column_game.drop(2, 'X')
+          two_column_game.drop(2, 'X')
+          expected = []
+          actual = two_column_game.valid_moves
+
+          expect(actual).to eq(expected)
+        end
+      end
+    end
+  end
 end
