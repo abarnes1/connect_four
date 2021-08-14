@@ -2,7 +2,7 @@ require_relative '../lib/gameboard'
 
 describe Gameboard do
   describe '#column_full?' do
-    context 'in a 2x2 game' do
+    context 'when game is 2x2' do
       subject(:full_column_game) { described_class.new(2, 2) }
 
       context 'when column 1 has 2 dropped tokens' do
@@ -10,7 +10,7 @@ describe Gameboard do
           full_column_game.drop(1, 'X')
           full_column_game.drop(1, 'X')
 
-          expect(full_column_game.column_full(1)).to eq(true)
+          expect(full_column_game.column_full?(1)).to eq(true)
         end
       end
 
@@ -18,137 +18,100 @@ describe Gameboard do
         it 'is not a full column' do
           full_column_game.drop(1, 'X')
 
-          expect(full_column_game.column_full(1)).to eq(false)
+          expect(full_column_game.column_full?(1)).to eq(false)
         end
       end
     end
   end
 
   describe '#connected_count' do
-    context 'when index has no token' do
-      subject(:none_in_row) { described_class.new(2, 2) }
-
+    context 'when identifier parameter passed' do
       context 'when checking empty index' do
+        subject(:empty_index_board) { described_class.new(2, 2) }
+
         it 'returns 0' do
-          expect(none_in_row.connected_count(0)).to be_zero
+          expect(empty_index_board.connected_count(0)).to be_zero
         end
       end
 
       context 'when checking out of bounds index' do
+        subject(:out_of_bounds_board) { described_class.new(2, 2) }
+
         it 'returns 0' do
-          expect(none_in_row.connected_count(100)).to be_zero
+          expect(out_of_bounds_board.connected_count(100)).to be_zero
+        end
+      end
+
+      context 'when single token dropped' do
+        subject(:single_drop_game) { described_class.new }
+
+        it 'returns streak of 1' do
+          index_to_check = single_drop_game.drop(3, 'X')
+          connected = single_drop_game.connected_count(index_to_check)
+
+          expect(connected).to eq(1)
+        end
+      end
+
+      context 'when 3 in a row horizontal' do
+        subject(:row_drop_game) { described_class.new }
+
+        it 'returns streak of 3' do
+          row_drop_game.drop(1, 'X')
+          row_drop_game.drop(2, 'X')
+
+          index_to_check = row_drop_game.drop(3, 'X')
+          connected = row_drop_game.connected_count(index_to_check)
+
+          expect(connected).to eq(3)
+        end
+      end
+
+      context 'when 3 in a row vertical' do
+        subject(:column_drop_game) { described_class.new }
+
+        it 'returns streak of 3' do
+          column_drop_game.drop(3, 'X')
+          column_drop_game.drop(3, 'X')
+          index_to_check = column_drop_game.drop(3, 'X')
+
+          connected = column_drop_game.connected_count(index_to_check)
+
+          expect(connected).to eq(3)
+        end
+      end
+
+      context 'when 3 in a row diagonal' do
+        subject(:diagonal_drop_game) { described_class.new }
+
+        it 'returns streak of 3' do
+          diagonal_drop_game.drop(1, 'X')
+
+          diagonal_drop_game.drop(2, '')
+          diagonal_drop_game.drop(2, 'X')
+
+          diagonal_drop_game.drop(3, '')
+          diagonal_drop_game.drop(3, '')
+          index_to_check = diagonal_drop_game.drop(3, 'X')
+
+          connected = diagonal_drop_game.connected_count(index_to_check)
+
+          expect(connected).to eq(3)
         end
       end
     end
 
-    context 'when single token' do
-      subject(:single_drop_game) { described_class.new }
+    context 'when identifier parameter is not passed' do
+      subject(:highest_not_last_move) { described_class.new(2, 2) }
 
-      it 'returns streak of 1' do
-        index_to_check = single_drop_game.drop(3, 'X')
-        connected = single_drop_game.connected_count(index_to_check)
+      it 'checks the whole board for highest possible result' do
+        highest_not_last_move.drop(1, 'X')
+        highest_not_last_move.drop(2, 'X')
+        highest_not_last_move.drop(1, 'O')
 
-        expect(connected).to eq(1)
-      end
-    end
+        connected = highest_not_last_move.connected_count
 
-    context 'when 3 in a row horizontal' do
-      subject(:row_drop_game) { described_class.new }
-
-      it 'returns streak of 3' do
-        row_drop_game.drop(1, 'X')
-        row_drop_game.drop(2, 'X')
-
-        index_to_check = row_drop_game.drop(3, 'X')
-        connected = row_drop_game.connected_count(index_to_check)
-
-        expect(connected).to eq(3)
-      end
-    end
-
-    context 'when 3 in a row vertical' do
-      subject(:column_drop_game) { described_class.new }
-
-      it 'returns streak of 3' do
-        column_drop_game.drop(3, 'X')
-        column_drop_game.drop(3, 'X')
-        index_to_check = column_drop_game.drop(3, 'X')
-
-        connected = column_drop_game.connected_count(index_to_check)
-
-        expect(connected).to eq(3)
-      end
-    end
-
-    context 'when 3 in a row diagonal' do
-      subject(:diagonal_drop_game) { described_class.new }
-
-      it 'returns streak of 3' do
-        diagonal_drop_game.drop(1, 'X')
-
-        diagonal_drop_game.drop(2, '')
-        diagonal_drop_game.drop(2, 'X')
-
-        diagonal_drop_game.drop(3, '')
-        diagonal_drop_game.drop(3, '')
-        index_to_check = diagonal_drop_game.drop(3, 'X')
-
-        connected = diagonal_drop_game.connected_count(index_to_check)
-
-        expect(connected).to eq(3)
-      end
-    end
-  end
-
-  describe '#coord_to_index' do
-    subject(:coord_game) { described_class.new }
-
-    context 'when coord is out of bounds' do
-      invalid_x = -1
-      invalid_y = 10
-      valid_x = 1
-      valid_y = 1
-
-      it "returns nil when x-coord is invalid (#{invalid_x})" do
-        valid = coord_game.coord_to_index(invalid_x, valid_y)
-        expect(valid).to be_nil
-      end
-
-      it "returns nil when y-coord is invalid (#{invalid_y})" do
-        valid = coord_game.coord_to_index(valid_x, invalid_y)
-        expect(valid).to be_nil
-      end
-    end
-
-    context 'when coord is in bounds' do
-      valid_x = 3
-      valid_y = 3
-      correct_index = 24
-
-      it "returns #{correct_index} for coord [#{valid_x}, #{valid_y}]" do
-        actual = coord_game.coord_to_index(valid_x, valid_y)
-        expect(actual).to eq(correct_index)
-      end
-    end
-  end
-
-  describe '#index_to_coord' do
-    subject(:index_game) { described_class.new }
-
-    context 'when index is out of bounds' do
-      invalid_index = 100
-      it "returns nil when index is invalid #{invalid_index}" do
-        actual = index_game.index_to_coord(invalid_index)
-        expect(actual).to be_nil
-      end
-    end
-
-    context 'when index is in bounds' do
-      valid_index = 9
-      expected_coord = [2, 1]
-      it "returns #{expected_coord} when index is valid #{valid_index}" do
-        actual = index_game.index_to_coord(valid_index)
-        expect(actual).to eq(expected_coord)
+        expect(connected).to eq(2)
       end
     end
   end
@@ -210,59 +173,6 @@ describe Gameboard do
         filled_game.drop(1, 'X')
 
         expect(filled_game).to be_full
-      end
-    end
-  end
-
-  describe '#valid_coord_move?' do
-    subject(:coord_test_game) { described_class.new }
-
-    context 'when moving inside the board' do
-      it 'is a valid move' do
-        valid = coord_test_game.valid_coord_move?(1, 1, 0)
-        expect(valid).to eq(true)
-      end
-    end
-
-    context 'when movement is out of bounds' do
-      context 'when left boundary broken' do
-        it 'is not a valid move' do
-          x_move = -1
-          y_move = 1
-          left_column_index = 7
-          valid = coord_test_game.valid_coord_move?(x_move, y_move, left_column_index)
-          expect(valid).to eq(false)
-        end
-      end
-
-      context 'when right boundary broken' do
-        it 'is not a valid move' do
-          x_move = 1
-          y_move = 0
-          right_column_index = 27
-          valid = coord_test_game.valid_coord_move?(x_move, y_move, right_column_index)
-          expect(valid).to eq(false)
-        end
-      end
-
-      context 'when top boundary broken' do
-        it 'is not a valid move' do
-          x_move = 0
-          y_move = -1
-          top_row_index = 5
-          valid = coord_test_game.valid_coord_move?(x_move, y_move, top_row_index)
-          expect(valid).to eq(false)
-        end
-      end
-
-      context 'when bottom boundary broken' do
-        it 'is not a valid move' do
-          x_move = 0
-          y_move = 1
-          bottom_row_index = 40
-          valid = coord_test_game.valid_coord_move?(x_move, y_move, bottom_row_index)
-          expect(valid).to eq(false)
-        end
       end
     end
   end

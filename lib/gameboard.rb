@@ -3,7 +3,7 @@ require_relative 'tokens'
 
 # contains game rows and columns, their boundaries, and allows tokens to be placed
 class Gameboard
-  attr_reader :last_move_index, :columns
+  attr_reader :columns
 
   def initialize(rows = 6, columns = 7)
     @columns = columns.freeze
@@ -39,51 +39,27 @@ class Gameboard
   end
 
   def column_full?(column)
-    column_tokens = column(column)
-    column_tokens.any?
+    column_contents = column(column)
+    column_contents.all? { |token| token != Tokens::EMPTY }
   end
 
   def full?
     @board.all? { |token| token != Tokens::EMPTY }
   end
 
-  def connected_count(index)
-    return 0 if @board[index] == Tokens::EMPTY || !index_inbounds?(index)
+  def connected_count(index = nil)
+    highest_streak = 0
 
-    highest_streak = 1
-    match_token = @board[index]
-
-    xy_movements = [[0, 1], [1, 0], [1, 1], [1, -1]]
-
-    xy_movements.each do |single_move|
-      opposite_move = single_move.map { |move| move * -1 }
-
-      streak = 1 + measure_repeat(single_move, index, match_token) + measure_repeat(opposite_move, index, match_token)
-      highest_streak = streak if streak > highest_streak
+    if index.nil?
+      @board.each_index do |id|
+        connected_by_id = connected_count_by_identifier(id)
+        highest_streak = connected_by_id if connected_by_id > highest_streak
+      end
+    else
+      highest_streak = connected_count_by_identifier(index)
     end
 
     highest_streak
-  end
-
-  def valid_coord_move?(x_move, y_move, start_index)
-    return false if x_move.negative? && column_indices(1).include?(start_index)
-    return false if x_move.positive? && column_indices(@columns).include?(start_index)
-    return false if y_move.negative? && row_indices(1).include?(start_index)
-    return false if y_move.positive? && row_indices(@rows).include?(start_index)
-
-    true
-  end
-
-  def coord_to_index(x_coord, y_coord)
-    return nil unless x_coord.between?(0, @columns - 1) && y_coord.between?(0, @rows - 1)
-
-    (y_coord * @columns) + x_coord
-  end
-
-  def index_to_coord(index)
-    return nil unless index_inbounds?(index)
-
-    [index % @columns, index / @columns]
   end
 
   private
@@ -113,6 +89,27 @@ class Gameboard
     index.between?(0, max_index)
   end
 
+  def valid_coord_move?(x_move, y_move, start_index)
+    return false if x_move.negative? && column_indices(1).include?(start_index)
+    return false if x_move.positive? && column_indices(@columns).include?(start_index)
+    return false if y_move.negative? && row_indices(1).include?(start_index)
+    return false if y_move.positive? && row_indices(@rows).include?(start_index)
+
+    true
+  end
+  
+  def coord_to_index(x_coord, y_coord)
+    return nil unless x_coord.between?(0, @columns - 1) && y_coord.between?(0, @rows - 1)
+
+    (y_coord * @columns) + x_coord
+  end
+
+  def index_to_coord(index)
+    return nil unless index_inbounds?(index)
+
+    [index % @columns, index / @columns]
+  end
+
   def measure_repeat(move, index, token)
     return 0 unless valid_coord_move?(move[0], move[1], index)
 
@@ -124,5 +121,23 @@ class Gameboard
     return 0 if @board[new_index] != token
 
     1 + measure_repeat(move, new_index, token)
+  end
+
+  def connected_count_by_identifier(index)
+    return 0 if @board[index] == Tokens::EMPTY || !index_inbounds?(index)
+
+    highest_streak = 1
+    match_token = @board[index]
+
+    xy_movements = [[0, 1], [1, 0], [1, 1], [1, -1]]
+
+    xy_movements.each do |single_move|
+      opposite_move = single_move.map { |move| move * -1 }
+
+      streak = 1 + measure_repeat(single_move, index, match_token) + measure_repeat(opposite_move, index, match_token)
+      highest_streak = streak if streak > highest_streak
+    end
+
+    highest_streak
   end
 end
