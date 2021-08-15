@@ -8,4 +8,4 @@ Key skills:
   - Implement public interfaces with chosen implementation
 - Testing with RSpec
   - Use arrange, act, assert pattern to write tests
-  - Using doubles to isolate tested behavior to the class under test
+  - Using doubles to isolate tested behavior to the class and/or function under test
