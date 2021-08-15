@@ -7,6 +7,8 @@ class ComputerPlayer
   end
 
   def choose_move(choices)
+    return nil if choices.nil?
+    
     choices.sample
   end
 end
