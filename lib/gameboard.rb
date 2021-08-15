@@ -1,4 +1,6 @@
-require 'pry-byebug'
+# frozen_string_literal: true
+
+# require 'pry-byebug'
 require_relative 'tokens'
 require_relative 'gameboard_printer'
 

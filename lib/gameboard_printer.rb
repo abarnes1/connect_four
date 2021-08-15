@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Generates string to print to terminal
 module GameboardPrinter
   def to_s
     output = "#{display_header_footer}\n"

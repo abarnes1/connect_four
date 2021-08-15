@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Contains attributes for a computer player that can make random moves
 class ComputerPlayer
   attr_reader :token, :name
 
@@ -8,7 +11,7 @@ class ComputerPlayer
 
   def choose_move(choices)
     return nil if choices.nil?
-    
+
     choices.sample
   end
 end
