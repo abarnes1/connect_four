@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Object that contains attributes for a human player
+# Contains attributes for a human player
 class HumanPlayer
   attr_reader :token, :name
 
