@@ -9,7 +9,7 @@ module GameboardPrinter
     row_count.times do |row_number|
       row_start_index = (row_number * @columns)
       row = @board.slice(row_start_index, @columns)
-      output += "| #{row.join(' ')}  |\n"
+      output += "| #{row.join(' ')} |\n"
     end
 
     output += display_header_footer
@@ -18,7 +18,7 @@ module GameboardPrinter
   end
 
   def display_header_footer
-    '=' * (2 * (@columns + 2))
+    '=' * (2 * (@columns + 1) + 1)
   end
 
   def column_selectors
