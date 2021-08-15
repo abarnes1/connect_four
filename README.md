@@ -1,4 +1,4 @@
-# connect_four
+# Connect Four
 This is the Connect Four project created as part of The Odin Project's Ruby curriculum.
 
 Key skills:
