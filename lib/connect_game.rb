@@ -15,7 +15,14 @@ class ConnectGame
     @win_length = win_length
     @gameboard = gameboard.nil? ? Gameboard.new : gameboard
     @last_move_identifier = nil
-    @winner = nil
+  end
+
+  def end_game
+    if game_won?
+      puts "#{current_player.name} #{current_player.token} wins!"
+    else
+      puts 'It was a draw :('
+    end
   end
 
   def last_move_result
@@ -25,20 +32,15 @@ class ConnectGame
   def play_game
     setup_game
     puts @gameboard.to_s
-    play_turns
 
-    if @winner.nil?
-      puts 'It was a draw :('
-    else
-      puts "#{@winner.name} #{@winner.token}  wins!"
-    end
+    play_turns
+    end_game
   end
 
   def setup_game
     @player1 = create_player('Player 1', Tokens::RED)
     @player2 = create_player('Player 2', Tokens::WHITE)
     @current_player = @player1
-    @winner = nil
     @last_move_identifier = nil
   end
 
@@ -62,12 +64,9 @@ class ConnectGame
       play_next_turn(@current_player)
       puts @gameboard.to_s
 
-      if game_won?
-        @winner = @current_player
-        return
-      end
+      @winner = current_player if game_won?
 
-      switch_player
+      switch_player if @winner.nil?
     end
   end
 
@@ -103,7 +102,7 @@ class ConnectGame
   end
 
   def switch_player
-    @current_player = @current_player == @player1 ? @player2 : @player1
+    @current_player = current_player == @player1 ? @player2 : @player1
   end
 
   def valid_move?(column)
