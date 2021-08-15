@@ -6,22 +6,20 @@ require_relative 'computer_player'
 
 # logic to setup, start, allow moves, and end a connect game
 class ConnectGame
-  attr_reader :last_token_placed, :current_player
+  attr_reader :current_player, :last_move_identifier
 
-  def initialize(rows = 6, columns = 7, win_length = 4)
+  def initialize(gameboard = nil, win_length = 4)
     @player1 = nil
     @player2 = nil
     @current_player = nil
     @win_length = win_length
-    @gameboard = Gameboard.new(rows, columns)
-    @last_token_placed = nil
+    @gameboard = gameboard.nil? ? Gameboard.new : gameboard
+    @last_move_identifier = nil
     @winner = nil
   end
 
-  def last_move_connect_length
-    return 0 if @last_token_placed.nil?
-
-    @gameboard.connected_count(@last_token_placed)
+  def last_move_result
+    @gameboard.connected_count(@last_move_identifier)
   end
 
   def play_game
@@ -41,7 +39,7 @@ class ConnectGame
     @player2 = create_player('Player 2', Tokens::WHITE)
     @current_player = @player1
     @winner = nil
-    @last_token_placed = nil
+    @last_move_identifier = nil
   end
 
   def create_player(name, token)
@@ -73,9 +71,9 @@ class ConnectGame
     end
   end
 
-  def play_next_turn(current_player)
-    input = player_input(current_player)
-    @last_token_placed = @gameboard.drop(input, current_player.token)
+  def play_next_turn(player)
+    input = player_input(player)
+    @last_move_identifier = @gameboard.drop(input, player.token)
   end
 
   def game_over?
@@ -84,16 +82,16 @@ class ConnectGame
     false
   end
 
-  def player_input(current_player)
+  def player_input(player)
     column = nil
 
-    until valid_player_input?(column) && valid_move?(column)
-      if current_player.instance_of?(HumanPlayer)
-        print "Choose a column for #{current_player.name} #{current_player.token} : "
+    until valid_move?(column)
+      if player.instance_of?(HumanPlayer)
+        print "Choose a column for #{player.name} #{player.token} : "
         column = gets.chomp.to_i
-      elsif current_player.instance_of?(ComputerPlayer)
-        column = @current_player.choose_move(@gameboard.columns.to_a)
-        puts "#{current_player.name} (#{current_player.token} ) chooses column ##{column}"
+      elsif player.instance_of?(ComputerPlayer)
+        column = player.choose_move(@gameboard.valid_moves)
+        puts "#{player.name} #{player.token}  chooses column ##{column}"
       end
     end
 
@@ -101,7 +99,7 @@ class ConnectGame
   end
 
   def game_won?
-    last_move_connect_length >= @win_length
+    last_move_result >= @win_length
   end
 
   def switch_player
@@ -109,15 +107,7 @@ class ConnectGame
   end
 
   def valid_move?(column)
-    column_values = @gameboard.column(column)
-    column_values.any?(Tokens::EMPTY) ? true : false
-  end
-
-  def valid_player_input?(input)
-    count = @gameboard.columns
-    return false unless (1..count).include?(input.to_i)
-
-    true
+    @gameboard.valid_moves.include?(column)
   end
 
   def to_s
