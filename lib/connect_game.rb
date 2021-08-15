@@ -92,6 +92,7 @@ class ConnectGame
         print "Choose a column for #{player.name} #{player.token} : "
         column = gets.chomp.to_i
       elsif player.instance_of?(ComputerPlayer)
+        sleep(1)
         column = player.choose_move(@gameboard.valid_moves)
         puts "#{player.name} #{player.token}  chooses column ##{column}"
       end

@@ -272,6 +272,7 @@ describe ConnectGame do
       let(:computer_player) { double('computer', name: '', token: '', choose_move: 1) }
 
       before do
+        allow(computer_input_game).to receive(:sleep)
         allow(computer_input_game).to receive(:print)
         allow(computer_input_game).to receive(:puts)
         allow(computer_input_game).to receive(:gets)
