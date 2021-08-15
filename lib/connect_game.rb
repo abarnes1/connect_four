@@ -17,34 +17,6 @@ class ConnectGame
     @last_move_identifier = nil
   end
 
-  def end_game
-    if game_won?
-      puts "#{current_player.name} #{current_player.token} wins!"
-    else
-      puts 'It was a draw :('
-    end
-  end
-
-  def last_move_result
-    @gameboard.connected_count(@last_move_identifier)
-  end
-
-  def play_game
-    print_intro
-    setup_game
-    puts @gameboard.to_s
-
-    play_turns
-    end_game
-  end
-
-  def setup_game
-    @player1 = create_player('Player 1', Tokens::RED)
-    @player2 = create_player('Player 2', Tokens::WHITE)
-    @current_player = @player1
-    @last_move_identifier = nil
-  end
-
   def create_player(name, token)
     player_type = ''
 
@@ -62,6 +34,42 @@ class ConnectGame
     end
   end
 
+  def end_game
+    if game_won?
+      puts "#{current_player.name} #{current_player.token} wins!"
+    else
+      puts 'It was a draw :('
+    end
+  end
+
+  def game_over?
+    return true if game_won? || @gameboard.full?
+
+    false
+  end
+
+  def game_won?
+    last_move_result >= @win_length
+  end
+
+  def last_move_result
+    @gameboard.connected_count(@last_move_identifier)
+  end
+
+  def play_game
+    print_intro
+    setup_game
+    puts @gameboard.to_s
+
+    play_turns
+    end_game
+  end
+
+  def play_next_turn(player)
+    input = player_input(player)
+    @last_move_identifier = @gameboard.drop(input, player.token)
+  end
+
   def play_turns
     until game_over?
       play_next_turn(@current_player)
@@ -71,17 +79,6 @@ class ConnectGame
 
       switch_player if @winner.nil?
     end
-  end
-
-  def play_next_turn(player)
-    input = player_input(player)
-    @last_move_identifier = @gameboard.drop(input, player.token)
-  end
-
-  def game_over?
-    return true if game_won? || @gameboard.full?
-
-    false
   end
 
   def player_input(player)
@@ -101,8 +98,17 @@ class ConnectGame
     column
   end
 
-  def game_won?
-    last_move_result >= @win_length
+  def print_intro
+    puts "Welcome to Connect #{@win_length}!"
+    puts @gameboard.to_s
+    puts "\nPlayers will alternate choosing a column to drop their token.  The first to #{@win_length} in a row wins.\n\n"
+  end
+
+  def setup_game
+    @player1 = create_player('Player 1', Tokens::RED)
+    @player2 = create_player('Player 2', Tokens::WHITE)
+    @current_player = @player1
+    @last_move_identifier = nil
   end
 
   def switch_player
@@ -111,11 +117,5 @@ class ConnectGame
 
   def valid_move?(column)
     @gameboard.valid_moves.include?(column)
-  end
-
-  def print_intro
-    puts "Welcome to Connect #{@win_length}!"
-    puts @gameboard.to_s
-    puts "\nPlayers will alternate choosing a column to drop their token.  The first to #{@win_length} in a row wins.\n\n"
   end
 end
