@@ -14,8 +14,6 @@ class Gameboard
     @board = Array.new(@columns * @rows) { Tokens::EMPTY }
   end
 
-
-
   def column(column)
     indices = column_indices(column)
     indices.map { |index| @board[index] }
