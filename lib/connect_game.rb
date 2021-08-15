@@ -30,6 +30,7 @@ class ConnectGame
   end
 
   def play_game
+    print_intro
     setup_game
     puts @gameboard.to_s
 
@@ -48,9 +49,11 @@ class ConnectGame
     player_type = ''
 
     until %w[1 2].include?(player_type)
-      puts "Choose a player type for #{name}.\n Enter 1 for Human or 2 for Computer: "
+      print "Choose a player type for #{name} #{token}\nEnter 1 for Human or 2 for Computer: "
       player_type = gets.chomp
     end
+
+    puts ''
 
     if player_type.eql?('1')
       HumanPlayer.new(name, token)
@@ -109,7 +112,9 @@ class ConnectGame
     @gameboard.valid_moves.include?(column)
   end
 
-  def to_s
-    @gameboard.to_s
+  def print_intro
+    puts "Welcome to Connect #{@win_length}!"
+    puts @gameboard.to_s
+    puts "\nPlayers will alternate choosing a column to drop their token.  The first to #{@win_length} in a row wins.\n\n"
   end
 end

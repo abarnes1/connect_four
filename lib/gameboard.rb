@@ -1,8 +1,11 @@
 require 'pry-byebug'
 require_relative 'tokens'
+require_relative 'gameboard_printer'
 
 # contains game rows and columns, their boundaries, and allows tokens to be placed
 class Gameboard
+  include GameboardPrinter
+
   attr_reader :columns
 
   def initialize(rows = 6, columns = 7)
@@ -11,18 +14,7 @@ class Gameboard
     @board = Array.new(@columns * @rows) { Tokens::EMPTY }
   end
 
-  def to_s
-    output = ''
-    row_count = @board.size / @columns
 
-    row_count.times do |row_number|
-      row_start_index = (row_number * @columns)
-      row = @board.slice(row_start_index, @columns)
-      output += "#{row.join(' ')}\n"
-    end
-
-    output
-  end
 
   def column(column)
     indices = column_indices(column)
